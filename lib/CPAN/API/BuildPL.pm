@@ -15,22 +15,22 @@ __END__
 *THIS DOCUMENT IS STILL A ROUGH DRAFT*
 
 This documentation describes an API for how a Build.PL file in a Perl
-distribution may be used to build and install the distribution.  This is
+distribution may be used to build and install the distribution. This is
 primarily of interest to CPAN clients like [CPAN], [CPANPLUS] and
 [cpanm].
 
 While Build.PL originated with [Module::Build], there is no reason that
-alternative pure-Perl build systems can't use the same mechanism.  With
+alternative pure-Perl build systems can't use the same mechanism. With
 the {configure_requires} key in distribution META files supported in the
 Perl core since version 5.10.1, it will be increasingly easy over time
 for other pure-Perl build system to flourish.
 
 The terms *must*, *should*, *may* and their negations have the usual
-IETF semantics.
+IETF [rfc2119|http://www.ietf.org/rfc/rfc2119.txt] semantics.
 
 The API described herein is a minimal feature sufficient for basic
 interoperability between a CPAN client and a pure-Perl build system to
-build, test and install Perl distributions.  Any build system *must*
+build, test and install Perl distributions. Any build system *must*
 provide all of the features. The build system *may* provide additional
 features, but CPAN clients *should not* rely on them.
 
@@ -43,12 +43,13 @@ documentation of [Module::Build] (copyright Ken Williams).
 
   perl Build.PL [options]
 
-* if run with a '--build-pl-api-version' option, *must* print on a single line to STDOUT
-the Build.PL API version supported and *must* exit with 0; it *must not* do
-any other processing described below; it *may* say what 
+* if run with a '--build-pl-api-version' option, it *must* print on a
+single line to STDOUT the Build.PL API version supported and *must* exit
+with 0; it *must not* do any other processing described below; it *may*
+say what FIXME
 * *must* generate a Build file if configuration is successful
 * *must* exit with exit code of zero if configuration is successful
-* *must* not generate a Build file if configuration fails
+* *must not* generate a Build file if configuration fails
 * *may* exit with a zero or non-zero exit code; clients *may* interpret
 a zero exit code with no Build file produced as a request to abort
 further action without signaling error to the user
@@ -73,11 +74,11 @@ A list of actions that *must* be supported follows:
 * *must* prepare the distribution for the test and install actions
 * *must* exit with 0 if the distribution is considered ready for
 testing/installation
-* *must* exit with a non-zero code if the distribution is not ready 
-for testing/installation
+* *must* exit with a non-zero code if the distribution is not ready for
+testing/installation
 
 Historically, this means compiling, copying files to blib, etc.
-and many existing tools may expect to find things in blib.  This is
+and many existing tools may expect to find things in blib. This is
 not necessarily the right way to do thing forever and ever.
 
 === 'test' action
@@ -100,12 +101,12 @@ successfully
 * *should* not modify paths not defined in other sections of this
 document
 * *should* preserve the prior state of the system if installation is
-unsuccessful 
+unsuccessful
 * *must not* require the test action to have been run
 
 = CONFIGURATION
 
-(blah blah configuration blah blah)
+FIXME (blah blah configuration blah blah)
 
 During execution of Build.PL or Build, options should have the following
 precedence (from high to low):
@@ -115,15 +116,15 @@ precedence (from high to low):
 * configuration file -- action-specific options
 * cached configuration from Build.PL (only when running Build)
 * configuration file -- wildcard (*)
-*
+* Built-in defaults
 
 Conceptually, options should be split on white space and then spliced
 together, with higher-precedence options following lower-precedence
-options.  Options should then be processed "in order".
+options. Options should then be processed "in order".
 
 == Command Line Options
 
-(write about them here, if only to refer to INSTALL_PATHS)
+FIXME (write about them here, if only to refer to INSTALL_PATHS)
 
 Initial thoughts:
 
@@ -145,22 +146,24 @@ if more than one exists:
   $ENV{HOME} . "/.modulebuildrc"
   $ENV{USERPROFILE} . "/.modulebuldrc"
 
+FIXME - more dirs?
+
 If a configuration file exists, the options specified there *must* used
 as defaults as if they were typed on the command line, but the actual
-command line *must* override defaults from a configuration file.  The
+command line *must* override defaults from a configuration file. The
 format of the configuration file is described below.
 
 As with Perl, a hash mark ({#}) begins a comment that continues to the
-end of the line it appears on.  Comments *must* be ignored.  Empty lines
+end of the line it appears on. Comments *must* be ignored. Empty lines
 or lines with only white space *must* also be ignored.
 
 The first word on a configuration line describe the 'action' to which
-the options apply.  The 'action' is the command given to the 'Build'
-program.  An action *must* be followed by whitespace and then the
-options.  Options *must* be formed just as they would be on the command
-line (e.g.  separated by whitespace).  They can be separated by any
+the options apply. The 'action' is the command given to the 'Build'
+program. An action *must* be followed by whitespace and then the
+options. Options *must* be formed just as they would be on the command
+line (e.g. separated by whitespace). They can be separated by any
 amount of whitespace, including newlines, as long there is whitespace at
-the beginning of each continued line.  If more than one line begins with
+the beginning of each continued line. If more than one line begins with
 the same action name, those lines are merged into one set of options in
 the order they appear.
 
@@ -183,25 +186,31 @@ errors.
 
 * MODULEBUILDRC -- specifies the preferred location of a configuration
 file
-* PERL_MB_OPT -- provides option as if they were specified on the command
-line to Build.PL or any Build action, but with precedence lower than
-actual command line options .  The string *must* be split on whitespace
-as the shell would and the result prepended to any actual command-line
-arguments in {@ARGV}
+* PERL_MB_OPT -- provides option as if they were specified on the
+command line to Build.PL or any Build action, but with precedence lower
+than actual command line options . The string *must* be split on
+whitespace as the shell would and the result prepended to any actual
+command-line arguments in {@ARGV}
 
+FIXME - What about other variables that influence how Module::Build is
+running? E.g. HARNESS_PERL_SWITCHES, HARNESS_VERBOSE, HOME, HOMEDRIVE,
+HOMEDRIVE, HOMEPATH, PERL5_CPAN_IS_RUNNING, PERL5_CPANPLUS_IS_RUNNING,
+PERL5LIB, PERL_CORE, PERL_CORE, TEST_VERBOSE
 
 =end wikidoc
 
 =head1 INSTALL PATHS
 
-When you invoke C<Build>, it needs to figure
-out where to install things.  The nutshell version of how this works
-is that default installation locations are determined from
-F<Config.pm>, and they may be overridden by using the C<install_path>
-parameter.  An C<install_base> parameter lets you specify an
-alternative installation root like F</home/foo>, and a C<destdir> lets
-you specify a temporary installation directory like F</tmp/install> in
-case you want to create bundled-up installable packages.
+When you invoke C<Build>, it needs to figure out where to install
+things. The nutshell version of how this works is that default
+installation locations are determined from F<Config.pm>, and they may be
+overridden by using the C<install_path> parameter. An C<install_base>
+parameter lets you specify an alternative installation root like
+F</home/foo>, and a C<destdir> lets you specify a temporary installation
+directory like F</tmp/install> in case you want to create bundled-up
+installable packages.
+
+FIXME - Give examples on using install_base, destdir, both
 
 A build system *must* provide default installation locations for
 the following types of installable items:
@@ -219,26 +228,26 @@ XS, L<Inline>, or similar code.
 
 =item script
 
-Programs written in pure Perl.  In order to improve reuse, try to make
+Programs written in pure Perl. In order to improve reuse, try to make
 these as small as possible - put the code into modules whenever
 possible.
 
 =item bin
 
 "Architecture-dependent" executable programs, i.e. compiled C code or
-something.  Pretty rare to see this in a perl distribution, but it
+something. Pretty rare to see this in a perl distribution, but it
 happens.
 
 =item bindoc
 
-Documentation for the stuff in C<script> and C<bin>.  Usually
-generated from the POD in those files.  Under Unix, these are manual
+Documentation for the stuff in C<script> and C<bin>. Usually
+generated from the POD in those files. Under Unix, these are manual
 pages belonging to the 'man1' category.
 
 =item libdoc
 
-Documentation for the stuff in C<lib> and C<arch>.  This is usually
-generated from the POD in F<.pm> files.  Under Unix, these are manual
+Documentation for the stuff in C<lib> and C<arch>. This is usually
+generated from the POD in F<.pm> files. Under Unix, these are manual
 pages belonging to the 'man3' category.
 
 =item binhtml
@@ -259,7 +268,7 @@ installation paths are determined:
 =item installdirs
 
 The default destinations for these installable things come from
-entries in your system's C<Config.pm>.  You can select from three
+entries in your system's C<Config.pm>. You can select from three
 different sets of default locations by setting the C<installdirs>
 parameter as follows:
 
@@ -280,7 +289,7 @@ parameter as follows:
   * Under some OS (eg. MSWin32) the destination for HTML documents is
     determined by the C<Config.pm> entry C<installhtmldir>.
 
-The default value of C<installdirs> is "site".  If you're creating
+The default value of C<installdirs> is "site". If you're creating
 vendor distributions of module packages, you may want to do something
 like this:
 
@@ -310,7 +319,7 @@ or this:
 =item install_base
 
 You can also set the whole bunch of installation paths by supplying the
-C<install_base> parameter to point to a directory on your system.  For
+C<install_base> parameter to point to a directory on your system. For
 instance, if you set C<install_base> to "/home/ken" on a Linux
 system, you'll install as follows:
 
@@ -343,12 +352,19 @@ platform you're installing on.
 
 =item prefix
 
-An implementation *may* implement this option for compatibility with ExtUtils::MakeMaker's PREFIX argument. If implemented it *must* behave the same as ExtUtils::MakeMaker 6.30 would given the PREFIX argument. In other words, the following examples must be equivalent.
+FIXME - Explicitly define ExtUtils::MakeMaker 6.30 PREFIX requirements
+
+An implementation *may* implement this option for compatibility with
+ExtUtils::MakeMaker's PREFIX argument. If implemented it *must* behave
+the same as ExtUtils::MakeMaker 6.30 would given the PREFIX argument. In
+other words, the following examples must be equivalent.
 
  perl Build.PL --prefix /tmp/foo
  perl Makefile.PL PREFIX=/tmp/foo
 
-If an implementation opts not implement prefix, it *must* give a descriptive error at the earliest possible time if a user tries to use it.
+If an implementation opts not implement prefix, it *must* give a
+descriptive error at the earliest possible time if a user tries to use
+it.
 
 =back
 
@@ -360,7 +376,7 @@ If an implementation opts not implement prefix, it *must* give a descriptive err
 * [CPANPLUS]
 * [cpanm]
 * [Module::Build]
-* [Acme::Module::Build::Tiny]
+* [Module::Build::Tiny]
 
 =end wikidoc
 
